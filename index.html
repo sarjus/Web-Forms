@@ -11,33 +11,50 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
+            margin: 0;
         }
         .container {
             background: #fff;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
         }
-        input, select {
+        input, select, button {
             width: 100%;
             padding: 10px;
-            margin: 8px 0;
+            margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
+            box-sizing: border-box;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-container input {
+            width: auto;
+            margin-right: 10px;
         }
         button {
-            width: 100%;
             background: #28a745;
             color: white;
-            padding: 10px;
             border: none;
-            border-radius: 5px;
             cursor: pointer;
         }
         button:hover {
             background: #218838;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            display: none;
         }
     </style>
 </head>
@@ -47,16 +64,20 @@
         <form id="registrationForm">
             <label for="name">Full Name:</label>
             <input type="text" id="name" name="name" required>
-            
+            <div class="error" id="nameError">Please enter your name</div>
+
             <label for="email">Email:</label>
             <input type="email" id="email" name="email" required>
-            
+            <div class="error" id="emailError">Please enter a valid email</div>
+
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required minlength="6">
-            
+            <div class="error" id="passwordError">Password must be at least 6 characters</div>
+
             <label for="dob">Date of Birth:</label>
             <input type="date" id="dob" name="dob" required>
-            
+            <div class="error" id="dobError">Please enter a valid date of birth</div>
+
             <label for="gender">Gender:</label>
             <select id="gender" name="gender" required>
                 <option value="">Select</option>
@@ -64,33 +85,68 @@
                 <option value="female">Female</option>
                 <option value="other">Other</option>
             </select>
-            
+
             <label for="phone">Phone:</label>
-            <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
-            
+            <input type="tel" id="phone" name="phone" pattern="^\+?[0-9\s\-]{10,15}$" required>
+            <div class="error" id="phoneError">Please enter a valid phone number (e.g., +91-9876543210)</div>
+
             <label for="website">Website:</label>
             <input type="url" id="website" name="website">
-            
-            <label for="agree">
+
+            <div class="checkbox-container">
                 <input type="checkbox" id="agree" name="agree" required>
-                I agree to the terms and conditions
-            </label>
-            
+                <label for="agree">I agree to the terms and conditions</label>
+            </div>
+
             <button type="submit">Submit</button>
         </form>
     </div>
 
     <script>
         document.getElementById('registrationForm').addEventListener('submit', function(event) {
-            let name = document.getElementById('name').value;
-            let email = document.getElementById('email').value;
-            let password = document.getElementById('password').value;
-            let dob = document.getElementById('dob').value;
-            let phone = document.getElementById('phone').value;
-            let agree = document.getElementById('agree').checked;
-            
-            if (!name || !email || !password || !dob || !phone || !agree) {
-                alert('Please fill out all required fields correctly.');
+            let isValid = true;
+
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const dob = document.getElementById('dob');
+            const phone = document.getElementById('phone');
+            const agree = document.getElementById('agree');
+
+            document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
+
+            if (!name.value.trim()) {
+                document.getElementById('nameError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!email.value.includes('@')) {
+                document.getElementById('emailError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (password.value.length < 6) {
+                document.getElementById('passwordError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!dob.value) {
+                document.getElementById('dobError').style.display = 'block';
+                isValid = false;
+            }
+
+            const phonePattern = /^\+?[0-9\s\-]{10,15}$/;
+            if (!phonePattern.test(phone.value)) {
+                document.getElementById('phoneError').style.display = 'block';
+                isValid = false;
+            }
+
+            if (!agree.checked) {
+                alert('Please agree to the terms and conditions.');
+                isValid = false;
+            }
+
+            if (!isValid) {
                 event.preventDefault();
             }
         });
